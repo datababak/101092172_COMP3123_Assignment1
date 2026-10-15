@@ -4,11 +4,17 @@
 // Import Express using CommonJS
 const express = require('express');
 
+// Load environment variables
+require('dotenv').config();
+
+// Import MongoDB connection function
+const connectDB = require('./config/db');
+
 // Create the Express application
 const app = express();
 
 // Define the server port
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware to read JSON data from requests
 app.use(express.json());
@@ -29,7 +35,15 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-});
+// Connect to MongoDB before starting the server
+const startServer = async () => {
+
+    await connectDB();
+
+    app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+    });
+
+};
+
+startServer();

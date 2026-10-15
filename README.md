@@ -20,6 +20,11 @@ MongoDB, and Mongoose.
 - Express server configured
 - Health-check endpoint implemented
 - Initial project structure created
+- MongoDB Atlas connected using Mongoose
+- Environment variables configured using dotenv
+- User model created
+- Employee model created
+- User-employee relationship defined using ObjectId
 
 ## Run the Application
 
