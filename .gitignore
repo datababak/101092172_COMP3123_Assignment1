@@ -1,0 +1,18 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Allow safe example configuration
+!.env.example
+
+# Local application logs
+logs/*.log
+
+# macOS files
+.DS_Store
+
+# Personal notes - do not upload to GitHub
+Babak.txt
