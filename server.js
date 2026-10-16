@@ -10,6 +10,10 @@ require('dotenv').config();
 // Import MongoDB connection function
 const connectDB = require('./config/db');
 
+// Import routes
+const userRoutes = require('./routes/UserRoutes');
+const employeeRoutes = require('./routes/EmployeeRoutes');
+
 // Create the Express application
 const app = express();
 
@@ -18,6 +22,10 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware to read JSON data from requests
 app.use(express.json());
+
+// API routes
+app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/emp', employeeRoutes);
 
 // Test route
 app.get('/', (req, res) => {
