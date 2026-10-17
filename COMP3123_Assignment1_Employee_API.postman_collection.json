@@ -1,0 +1,366 @@
+{
+  "info": {
+    "_postman_id": "aaee51ea-21b4-4bb8-bbd3-35a9b87d2bc0",
+    "name": "COMP3123_Assignment1_Employee_API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58443504",
+    "_collection_link": "https://go.postman.co/collection/58443504-aaee51ea-21b4-4bb8-bbd3-35a9b87d2bc0?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01 - User Signup",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// COMP3123 - Assignment 1\n// Automated tests for User Signup\n\n// Test 1: Verify successful registration status\npm.test(\"Signup returns 201 Created\", function () {\n    pm.response.to.have.status(201);\n});\n\n// Test 2: Verify success message\npm.test(\"Signup returns success message\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.message)\n        .to.eql(\"User registered successfully\");\n});\n\n// Test 3: Verify user information is returned\npm.test(\"Signup returns user ID, username and email\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.user.id).to.exist;\n    pm.expect(response.user.username).to.eql(\n        pm.collectionVariables.get(\"username\")\n    );\n    pm.expect(response.user.email).to.eql(\n        pm.collectionVariables.get(\"email\")\n    );\n});\n\n// Test 4: Verify password is not exposed\npm.test(\"Signup does not expose password\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.user).to.not.have.property(\"password\");\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableCookies": false,
+        "followRedirects": true,
+        "protocolVersion": "auto",
+        "strictSSL": false
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/signup",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "user",
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 - User Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// COMP3123 - Assignment 1\n// Automated tests for User Login\n\n// Test 1: Verify successful login\npm.test(\"Login returns 200 OK\", function () {\n    pm.response.to.have.status(200);\n});\n\n// Test 2: Verify success message\npm.test(\"Login returns success message\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.message).to.eql(\"Login successful\");\n});\n\n// Test 3: Verify JWT is returned\npm.test(\"Login returns JWT token\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.token).to.be.a(\"string\");\n    pm.expect(response.token.split(\".\")).to.have.lengthOf(3);\n});\n\n// Test 4: Verify correct user information\npm.test(\"Login returns correct user\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.user.id).to.exist;\n    pm.expect(response.user.username).to.eql(\n        pm.collectionVariables.get(\"username\")\n    );\n});\n\n// Save JWT for subsequent employee requests\nif (pm.response.code === 200) {\n    const response = pm.response.json();\n\n    pm.collectionVariables.set(\"token\", response.token);\n\n    console.log(\"Login successful. JWT saved.\");\n}"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableCookies": false,
+        "followRedirects": true,
+        "protocolVersion": "auto",
+        "strictSSL": false
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "user",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 - Create Employee",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// COMP3123 - Assignment 1\n// Automated tests for Create Employee\n\n// Test 1: Verify successful employee creation\npm.test(\"Create Employee returns 201 Created\", function () {\n    pm.response.to.have.status(201);\n});\n\n// Test 2: Verify success message\npm.test(\"Employee creation returns success message\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.message)\n        .to.eql(\"Employee created successfully\");\n});\n\n// Test 3: Verify employee ID was generated\npm.test(\"New employee has a MongoDB ID\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.employee._id).to.be.a(\"string\");\n    pm.expect(response.employee._id).to.match(/^[0-9a-fA-F]{24}$/);\n});\n\n// Test 4: Verify employee information\npm.test(\"Employee information is saved correctly\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.employee.first_name).to.eql(\"Emily\");\n    pm.expect(response.employee.last_name).to.eql(\"Davis\");\n    pm.expect(response.employee.salary).to.eql(72000);\n    pm.expect(response.employee.department).to.eql(\"Marketing\");\n});\n\n// Save employee ID for subsequent GET, PUT, and DELETE requests\nif (pm.response.code === 201) {\n    const response = pm.response.json();\n\n    pm.collectionVariables.set(\"employeeId\", response.employee._id);\n\n    console.log(\"Employee created. ID saved.\");\n}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"first_name\": \"Emily\",\n  \"last_name\": \"Davis\",\n  \"email\": \"emily.davis@example.com\",\n  \"position\": \"Marketing Specialist\",\n  \"salary\": 72000,\n  \"date_of_joining\": \"2025-05-15\",\n  \"department\": \"Marketing\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/emp/employees",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "emp",
+            "employees"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 - Get All Employees",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// COMP3123 - Assignment 1\n// Automated tests for GET All Employees\n\n// Test 1: Verify successful response\npm.test(\"Get All Employees returns 200 OK\", function () {\n    pm.response.to.have.status(200);\n});\n\n// Test 2: Verify success message\npm.test(\"Employees retrieved successfully\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.message)\n        .to.eql(\"Employees retrieved successfully\");\n});\n\n// Test 3: Verify employees is an array\npm.test(\"Response contains an employees array\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.employees).to.be.an(\"array\");\n});\n\n// Test 4: Verify the newly created employee is included\npm.test(\"Created employee appears in the list\", function () {\n    const response = pm.response.json();\n\n    const employeeId = pm.collectionVariables.get(\"employeeId\");\n\n    const employeeExists = response.employees.some(\n        employee => employee._id === employeeId\n    );\n\n    pm.expect(employeeExists).to.be.true;\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/emp/employees",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "emp",
+            "employees"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 - Get Employee by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// COMP3123 - Assignment 1\n// Automated tests for GET Employee by ID\n\n// Test 1: Verify HTTP status\npm.test(\"Get Employee by ID returns 200 OK\", function () {\n    pm.response.to.have.status(200);\n});\n\n// Test 2: Verify success message\npm.test(\"Employee retrieved successfully\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.message)\n        .to.eql(\"Employee retrieved successfully\");\n});\n\n// Test 3: Verify the correct employee ID\npm.test(\"Returned employee ID matches requested ID\", function () {\n    const response = pm.response.json();\n\n    const employeeId = pm.collectionVariables.get(\"employeeId\");\n\n    pm.expect(response.employee._id).to.eql(employeeId);\n});\n\n// Test 4: Verify employee information\npm.test(\"Returned employee information is correct\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.employee.first_name).to.eql(\"Emily\");\n    pm.expect(response.employee.last_name).to.eql(\"Davis\");\n    pm.expect(response.employee.salary).to.eql(72000);\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/emp/employees/{{employeeId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "emp",
+            "employees",
+            "{{employeeId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 - Update Employee",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// COMP3123 - Assignment 1\n// Automated tests for Update Employee (PUT)\n\n// Test 1: Verify HTTP status\npm.test(\"Update Employee returns 200 OK\", function () {\n    pm.response.to.have.status(200);\n});\n\n// Test 2: Verify success message\npm.test(\"Employee updated successfully\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.message)\n        .to.eql(\"Employee updated successfully\");\n});\n\n// Test 3: Verify the correct employee was updated\npm.test(\"Updated employee ID matches requested ID\", function () {\n    const response = pm.response.json();\n\n    const employeeId = pm.collectionVariables.get(\"employeeId\");\n\n    pm.expect(response.employee._id).to.eql(employeeId);\n});\n\n// Test 4: Verify updated values\npm.test(\"Employee position and salary are updated\", function () {\n    const response = pm.response.json();\n\n    pm.expect(response.employee.position)\n        .to.eql(\"Senior Marketing Specialist\");\n\n    pm.expect(response.employee.salary).to.eql(85000);\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"position\": \"Senior Marketing Specialist\",\n  \"salary\": 85000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/emp/employees/{{employeeId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "emp",
+            "employees",
+            "{{employeeId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 - Delete Employee",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// COMP3123 - Assignment 1\n// Automated tests for Delete Employee (DELETE)\n\n// Test 1: Verify HTTP status\npm.test(\"Delete Employee returns 204 No Content\", function () {\n    pm.response.to.have.status(204);\n});\n\n// Test 2: Verify response body is empty\npm.test(\"Delete Employee returns an empty response body\", function () {\n    pm.expect(pm.response.text()).to.eql(\"\");\n});\n\n// Test 3: Verify the request uses an employee ID\npm.test(\"Delete request includes an employee ID\", function () {\n    const employeeId = pm.collectionVariables.get(\"employeeId\");\n\n    pm.expect(employeeId).to.be.a(\"string\");\n    pm.expect(employeeId).to.match(/^[0-9a-fA-F]{24}$/);\n});\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/emp/employees?eid={{employeeId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "emp",
+            "employees"
+          ],
+          "query": [
+            {
+              "key": "eid",
+              "value": "{{employeeId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "username",
+      "value": "testuser11"
+    },
+    {
+      "key": "email",
+      "value": "testuser11@example.com"
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "employeeId",
+      "value": ""
+    }
+  ]
+}
