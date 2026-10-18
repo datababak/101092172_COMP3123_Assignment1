@@ -47,26 +47,32 @@ app.use(helmet());
 const fs = require('fs');
 const path = require('path');
 
-// Create logs directory if it does not exist
-const logsDirectory = path.join(__dirname, 'logs');
-
-if (!fs.existsSync(logsDirectory)) {
-    fs.mkdirSync(logsDirectory);
-}
-
-// Create a stream to write logs to a file
-const accessLogStream = fs.createWriteStream(
-    path.join(logsDirectory, 'access.log'),
-    { flags: 'a' }
-);
-
-// Log requests to the terminal
+// Log requests to the terminal (locally)
+// or Vercel's function logs (in production)
 app.use(morgan('dev'));
 
-// Log requests to logs/access.log
-app.use(morgan('combined', {
-    stream: accessLogStream
-}));
+// Vercel has a read-only application filesystem.
+// Only create local log files outside Vercel.
+if (!process.env.VERCEL) {
+
+    // Create logs directory if it does not exist
+    const logsDirectory = path.join(__dirname, 'logs');
+
+    if (!fs.existsSync(logsDirectory)) {
+        fs.mkdirSync(logsDirectory, { recursive: true });
+    }
+
+    // Create a stream to write logs to a file
+    const accessLogStream = fs.createWriteStream(
+        path.join(logsDirectory, 'access.log'),
+        { flags: 'a' }
+    );
+
+    // Log requests to logs/access.log locally
+    app.use(morgan('combined', {
+        stream: accessLogStream
+    }));
+}
 
 
 // Limit each IP address to 100 requests per 15 minutes
